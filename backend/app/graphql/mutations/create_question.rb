@@ -1,16 +1,24 @@
-# frozen_string_literal: true
-
 module Mutations
   class CreateQuestion < BaseMutation
-    # TODO: define return fields
-    # field :post, Types::PostType, null: false
+    argument :content, String, required: true
 
-    # TODO: define arguments
-    # argument :name, String, required: true
+    field :question, Types::QuestionType, null: true
+    field :errors, [String], null: false
 
-    # TODO: define resolve method
-    # def resolve(name:)
-    #   { post: ... }
-    # end
+    def resolve(content:)
+      question = Question.new(content: content, answered: false)
+
+      if question.save
+        {
+          question: question,
+          errors: [],
+        }
+      else
+        {
+          question: nil,
+          errors: question.errors.full_messages,
+        }
+      end
+    end
   end
 end
