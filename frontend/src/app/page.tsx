@@ -27,6 +27,19 @@ const CREATE_QUESTION = gql`
   }
 `
 
+const ANSWER_QUESTION = gql`
+  mutation AnswerQuestion($id: ID!, $answer: String!) {
+    answerQuestion(input: { id: $id, answer: $answer }) {
+      question {
+        id
+        answer
+        answered
+      }
+      errors
+    }
+  }
+`
+
 export default function Home() {
   const { loading, error, data, refetch } = useQuery(GET_QUESTIONS)
   const [content, setContent] = useState('')
