@@ -44,6 +44,7 @@ export default function Home() {
   const { loading, error, data, refetch } = useQuery(GET_QUESTIONS)
   const [content, setContent] = useState('')
   const [createQuestion, {loading: creating, error: createError }] = useMutation(CREATE_QUESTION)
+  const [answerQuestion] = useMutation(ANSWER_QUESTION)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -69,7 +70,7 @@ export default function Home() {
         <button
           type="submit"
           disabled={creating}
-          className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
+          className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50 font-bold"
         >
           送信
         </button>
@@ -84,18 +85,54 @@ export default function Home() {
       ) : (
         <ul className="space-y-4">
           {data.questions.map((q: any) => (
-            <li key={q.id} className="p-4 border rounded shadow-sm">
+            <li key={q.id} className="p-6 border rounded shadow-sm space-y-2">
               <p className="mb-2">
                 <strong>質問:</strong> {q.content}
               </p>
-              <p>
-                <strong>回答:</strong>{' '}
-                {q.answered ? q.answer : <span className="text-gray-500">未回答</span>}
+
+              {q.answered ? (
+                <p>
+                  <strong>回答:</strong> {q.answer}
                 </p>
-              </li>
-            ))}
-          </ul>
-        )}
-      </main>
-    )
-  }
+              ) : (
+                <form
+                  className="space-y-2"
+                  onSubmit={async (e) => {
+                    e.preventDefault()
+                    const form = e.target as HTMLFormElement
+                    const input = form.elements.namedItem('answer') as HTMLInputElement
+                    const answer = input.value.trim()
+                    if (!answer) return
+
+                    await answerQuestion({
+                      variables: { id: q.id, answer},
+                    })
+
+                    refetch()
+                    form.reset()
+                  }}
+                >
+                  <label className="block">
+                    <strong>回答：</strong>
+                    <input
+                      type="text"
+                      name="answer"
+                      className="ml-2 px-2 py-1 border rounded w-full mt-1"
+                      placeholder="ここに回答を入力"
+                    />
+                  </label>
+                  <button
+                    type="submit"
+                    className="px-3 py-2 bg-green-600 text-white rounded font-bold"
+                  >
+                    回答する
+                  </button>
+                </form>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+    </main>
+  )
+}
