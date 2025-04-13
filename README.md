@@ -100,7 +100,7 @@ graphql-qa/
 
 ## 📸 スクリーンショット
 
-![アプリのスクリーンショット](https://github.com/Tatsuki-Otake/graphql-qa/raw/main/frontend/public/screenshot.png)
+https://github.com/Tatsuki-Otake/graphql-qa/raw/main/frontend/public/screenshot.png
 
 ---
 
