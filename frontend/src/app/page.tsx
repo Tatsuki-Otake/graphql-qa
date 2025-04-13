@@ -10,6 +10,7 @@ const GET_QUESTIONS = gql`
       content
       answer
       answered
+      createdAt
       }
   }
 `
@@ -40,6 +41,19 @@ const ANSWER_QUESTION = gql`
   }
 `
 
+const DELETE_ANSWER = gql`
+  mutation DeleteAnswer($id: ID!) {
+    deleteAnswer(input: { id: $id }) {
+      question {
+        id
+        answer
+        answered
+      }
+    errors
+    }
+  }
+`
+
 export default function Home() {
   const { loading, error, data, refetch } = useQuery(GET_QUESTIONS)
   const [content, setContent] = useState('')
@@ -47,6 +61,7 @@ export default function Home() {
   const [editingAnswers, setEditingAnswers] = useState<{ [id: string]: string }>({})
   const [createQuestion, { loading: creating, error: createError }] = useMutation(CREATE_QUESTION)
   const [answerQuestion] = useMutation(ANSWER_QUESTION)
+  const [deleteAnswer] = useMutation(DELETE_ANSWER)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -111,6 +126,9 @@ export default function Home() {
               <p className="mb-2 font-medium">
                 <strong>質問:</strong> {q.content}
               </p>
+              <p className="text-xs text-amber-500">
+                投稿日: {new Date(q.createdAt).toLocaleString()}
+              </p>
 
               {q.answered ? (
                 <div className="space-y-1">
@@ -148,6 +166,15 @@ export default function Home() {
                         className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
                       >
                         保存
+                      </button>
+                      <button
+                        className="text-sm text-red-500 underline ml-4"
+                        onClick={async () => {
+                          await deleteAnswer({ variables: { id: q.id } })
+                          refetch()
+                        }}
+                      >
+                        削除
                       </button>
                     </form>
                   ) : (
