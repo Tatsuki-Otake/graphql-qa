@@ -45,14 +45,14 @@ export default function Home() {
   const [content, setContent] = useState('')
   const [showUnansweredOnly, setShowUnansweredOnly] = useState(false)
   const [editingAnswers, setEditingAnswers] = useState<{ [id: string]: string }>({})
-
   const [createQuestion, { loading: creating, error: createError }] = useMutation(CREATE_QUESTION)
   const [answerQuestion] = useMutation(ANSWER_QUESTION)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!content.trim()) return
-    await createQuestion({ variables: { content } })
+    const trimmed = content.trim()
+    if (!trimmed || trimmed.length > 200) return
+    await createQuestion({ variables: { content: trimmed } })
     setContent('')
     refetch()
   }
@@ -62,36 +62,41 @@ export default function Home() {
   )
 
   return (
-    <main className="p-4 max-w-2xl mx-auto space-y-6">
-      <h1 className="text-2xl font-bold">質問一覧</h1>
+    <main className="p-4 sm:p-6 max-w-2xl mx-auto space-y-6">
+      <h1 className="text-3xl font-bold text-center">質問一覧</h1>
 
       {/*　質問投稿フォーム */}
-      <form onSubmit={handleSubmit} className="flex gap-2">
+      <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2">
         <input
           type="text"
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          placeholder="質問を入力..."
-          className="flex-1 px-4 py-2 border rounded"
+          placeholder="質問を入力(200文字以内)"
+          maxLength={200}
+          className="flex-1 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
         <button
           type="submit"
-          disabled={creating}
-          className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50 font-bold"
+          disabled={creating || !content.trim() || content.length > 200}
+          className="px-4 py-2 bg-blue-600 text-white rounded-md shadow hover:bg-blue-700 transition disabled:opacity-50 font-bold"
         >
           送信
         </button>
       </form>
       {createError && <p className="text-red-500">送信エラー: {createError.message}</p>}
 
-      {/*未回答のみ表示切り替え */}
+      {/*未回答のみ表示切り替えフィルター */}
       <div className="flex items-center gap-2">
         <input
+          id="filter-unanswered"
           type="checkbox"
           checked={showUnansweredOnly}
           onChange={(e) => setShowUnansweredOnly(e.target.checked)}
+          className="w-4 h-4"
         />
-        <label>未回答の質問のみ表示</label>
+        <label htmlFor="filter-unanswered" className="text-sm text-white-700">
+          未回答の質問のみ表示
+        </label>
       </div>
 
       {/* 質問一覧 */}
@@ -103,7 +108,7 @@ export default function Home() {
         <ul className="space-y-4">
           {filteredQuestions.map((q: any) => (
             <li key={q.id} className="p-6 border rounded shadow-sm space-y-2">
-              <p className="mb-2">
+              <p className="mb-2 font-medium">
                 <strong>質問:</strong> {q.content}
               </p>
 
@@ -115,7 +120,7 @@ export default function Home() {
                       onSubmit={async (e) => {
                         e.preventDefault()
                         const newAnswer = editingAnswers[q.id].trim()
-                        if (!newAnswer) return
+                        if (!newAnswer || newAnswer.length > 300) return
                         await answerQuestion({ variables: { id: q.id, answer: newAnswer } })
                         setEditingAnswers((prev) => {
                           const updated = { ...prev }
@@ -129,17 +134,18 @@ export default function Home() {
                       <input
                         type="text"
                         value={editingAnswers[q.id]}
+                        maxLength={300}
                         onChange={(e) =>
                           setEditingAnswers((prev) => ({
                             ...prev,
                             [q.id]: e.target.value,
                           }))
                         }
-                        className="w-full px-2 py-1 border rounded"
+                        className="w-full px-3 py-2 border rounded-md shadow-sm focus:ring focus:ring-green-300"
                       />
                       <button
                         type="submit"
-                        className="px-3 py-1 bg-green-600 text-white rounded"
+                        className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
                       >
                         保存
                       </button>
@@ -166,7 +172,7 @@ export default function Home() {
                     const form = e.target as HTMLFormElement
                     const input = form.elements.namedItem('answer') as HTMLInputElement
                     const answer = input.value.trim()
-                    if (!answer) return
+                    if (!answer || answer.length > 300) return
 
                     await answerQuestion({
                       variables: { id: q.id, answer},
@@ -176,18 +182,20 @@ export default function Home() {
                     form.reset()
                   }}
                 >
-                  <label className="block">
+                  <label className="block text-sm font-medium">
                     <strong>回答：</strong>
                     <input
                       type="text"
                       name="answer"
-                      className="ml-2 px-2 py-1 border rounded w-full mt-1"
                       placeholder="ここに回答を入力"
+                      maxLength={300}
+                      className="mt-1 w-full px-3 py-2 border border-gray-300 rounded shadow-sm focus:ring focus:ring-green-300"
+
                     />
                   </label>
                   <button
                     type="submit"
-                    className="px-3 py-1 bg-green-600 text-white rounded font-bold"
+                    className="px-3 py-1 bg-green-600 text-white rounded hover: bg-green-700 font-bold"
                   >
                     回答する
                   </button>
