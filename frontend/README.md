@@ -1,4 +1,3 @@
-```md
 # 📦 GraphQL QA App
 
 GraphQL ハンズオン学習のための「シンプルな質問箱アプリ」です。
