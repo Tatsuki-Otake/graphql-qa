@@ -97,7 +97,7 @@ export default function Home() {
         <input
           type="text"
           value={content}
-          onChange={(e) => setContent(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setContent(e.target.value)}
           placeholder="質問を入力(200文字以内)"
           maxLength={200}
           className="flex-1 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
@@ -118,10 +118,10 @@ export default function Home() {
           id="filter-unanswered"
           type="checkbox"
           checked={showUnansweredOnly}
-          onChange={(e) => setShowUnansweredOnly(e.target.checked)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setShowUnansweredOnly(e.target.checked)}
           className="w-4 h-4"
         />
-        <label htmlFor="filter-unanswered" className="text-sm text-white-700">
+        <label htmlFor="filter-unanswered" className="text-sm text-gray-700">
           未回答の質問のみ表示
         </label>
       </div>
@@ -147,7 +147,7 @@ export default function Home() {
                   <strong>回答:</strong>
                   {editingAnswers[q.id] !== undefined ? (
                     <form
-                      onSubmit={async (e) => {
+                      onSubmit={async (e: React.FormEvent<HTMLFormElement>) => {
                         e.preventDefault()
                         const newAnswer = editingAnswers[q.id].trim()
                         if (!newAnswer || newAnswer.length > 300) return
@@ -165,7 +165,7 @@ export default function Home() {
                         type="text"
                         value={editingAnswers[q.id]}
                         maxLength={300}
-                        onChange={(e) =>
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                           setEditingAnswers((prev) => ({
                             ...prev,
                             [q.id]: e.target.value,
@@ -206,9 +206,9 @@ export default function Home() {
               ) : (
                 <form
                   className="space-y-2"
-                  onSubmit={async (e) => {
+                  onSubmit={async (e: React.FormEvent<HTMLFormElement>) => {
                     e.preventDefault()
-                    const form = e.target as HTMLFormElement
+                    const form = e.currentTarget
                     const input = form.elements.namedItem('answer') as HTMLInputElement
                     const answer = input.value.trim()
                     if (!answer || answer.length > 300) return
