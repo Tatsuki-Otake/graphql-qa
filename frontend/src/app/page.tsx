@@ -84,7 +84,7 @@ export default function Home() {
     refetch()
   }
 
-  const filteredQuestions: Question[] | undefined = data?.questions.filter((q) =>
+  const filteredQuestions: Question[] | undefined = data?.questions.filter((q: Question) =>
     showUnansweredOnly ? !q.answered : true
   )
 
