@@ -84,7 +84,7 @@ export default function Home() {
     refetch()
   }
 
-  const filteredQuestions = data?.questions.filter((q) =>
+  const filteredQuestions: Question[] | undefined = data?.questions.filter((q) =>
     showUnansweredOnly ? !q.answered : true
   )
 
@@ -133,7 +133,7 @@ export default function Home() {
         <p className="text-red-500">取得エラー: {error.message}</p>
       ) : (
         <ul className="space-y-4">
-          {filteredQuestions?.map((q) => (
+          {filteredQuestions?.map((q: Question) => (
             <li key={q.id} className="p-6 border rounded shadow-sm space-y-2">
               <p className="mb-2 font-medium">
                 <strong>質問:</strong> {q.content}
