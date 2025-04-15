@@ -11,6 +11,10 @@ type Question = {
   createdAt: string
 }
 
+type GetQuestionsData = {
+  questions: Question[]
+}
+
 const GET_QUESTIONS = gql`
   query GetQuestions {
     questions {
@@ -63,7 +67,7 @@ const DELETE_ANSWER = gql`
 `
 
 export default function Home() {
-  const { loading, error, data, refetch } = useQuery(GET_QUESTIONS)
+  const { loading, error, data, refetch } = useQuery<GetQuestionsData>(GET_QUESTIONS)
   const [content, setContent] = useState('')
   const [showUnansweredOnly, setShowUnansweredOnly] = useState(false)
   const [editingAnswers, setEditingAnswers] = useState<{ [id: string]: string }>({})
@@ -80,7 +84,7 @@ export default function Home() {
     refetch()
   }
 
-  const filteredQuestions = data?.questions.filter((q: Question) =>
+  const filteredQuestions = data?.questions.filter((q) =>
     showUnansweredOnly ? !q.answered : true
   )
 
@@ -129,7 +133,7 @@ export default function Home() {
         <p className="text-red-500">取得エラー: {error.message}</p>
       ) : (
         <ul className="space-y-4">
-          {filteredQuestions.map((q: Question) => (
+          {filteredQuestions?.map((q) => (
             <li key={q.id} className="p-6 border rounded shadow-sm space-y-2">
               <p className="mb-2 font-medium">
                 <strong>質問:</strong> {q.content}
