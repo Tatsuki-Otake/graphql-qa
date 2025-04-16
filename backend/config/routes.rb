@@ -7,6 +7,6 @@ Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
 
   if Rails.env.development? || Rails.env.production?
-    mount GraphiQL::Rails::Engine, at: "/", graphql_path: "/graphql"
+    mount GraphiQL::Rails::Engine, at: "/graphiql", graphql_path: "/graphql"
   end
 end
